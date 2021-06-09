@@ -34,13 +34,13 @@ class PostRepository extends BaseRepository implements PostRepositoryInterface
     public function all($search = null): Collection
     {
         $query = $this->model->query();
-        if ($search) {
-            return $query->with('categories')
+        return $query->when($search, function ($query) use ($search) {
+            $query->with('categories')
                 ->whereHas('categories', function ($query) use ($search) {
                     $query->where('category_id', $search);
                 })->get();
-        }
-        return $query->latest()->get();
+        })->latest()
+            ->get();
     }
 
     /**
